@@ -43,6 +43,30 @@ function excerpt(value, length = 240) {
   return text.length > length ? `${text.slice(0, length)}…` : text
 }
 
+/**
+ * The GitHub API is a third party that the site reads from at runtime. On a
+ * shared CI runner the unauthenticated rate limit is regularly exhausted, and
+ * the browser logs the resulting 403 as a console error. The app handles that
+ * gracefully (the star badge degrades to a placeholder), so those errors are
+ * not page defects and must not fail the run.
+ */
+const THIRD_PARTY_HOSTS = ['api.github.com']
+
+function isThirdPartyError(message) {
+  const location = message.location?.()
+  if (!location?.url) return false
+  return THIRD_PARTY_HOSTS.some((host) => location.url.includes(host))
+}
+
+function collectConsoleErrors(page, sink) {
+  page.on('console', (message) => {
+    if (message.type() !== 'error') return
+    if (isThirdPartyError(message)) return
+    sink.push(excerpt(message.text(), 300))
+  })
+  page.on('pageerror', (error) => sink.push(`pageerror: ${error.message}`))
+}
+
 async function rawShellChecks(baseUrl) {
   console.log('\nStatic route shells')
 
@@ -93,10 +117,7 @@ async function browserChecks(baseUrl) {
   const page = await context.newPage()
 
   const consoleErrors = []
-  page.on('console', (message) => {
-    if (message.type() === 'error') consoleErrors.push(excerpt(message.text(), 300))
-  })
-  page.on('pageerror', (error) => consoleErrors.push(`pageerror: ${error.message}`))
+  collectConsoleErrors(page, consoleErrors)
 
   const internalLinks = new Map()
   const externalLinks = new Set()
@@ -269,10 +290,12 @@ async function browserChecks(baseUrl) {
     const rel = await link.getAttribute('rel')
     assert((rel || '').includes('noopener'), 'star link is missing rel="noopener"')
 
+    // The badge must settle on a terminal state: a live count, a cached
+    // count, or a graceful placeholder when the API is unreachable.
     await page.waitForFunction(
       () => {
-        const count = document.querySelector('.nav__stars-count')
-        return count && /^\d[\d,.]*$/.test(count.textContent.trim())
+        const status = document.querySelector('.nav__stars')?.getAttribute('data-status')
+        return status === 'ready' || status === 'error'
       },
       { timeout: 15000 }
     )
@@ -281,7 +304,21 @@ async function browserChecks(baseUrl) {
       value: document.querySelector('.nav__stars-count')?.textContent.trim(),
       status: document.querySelector('.nav__stars')?.getAttribute('data-status'),
     }))
-    assert(live.status === 'ready', `star badge status was ${live.status}`)
+
+    if (live.status === 'error') {
+      // Only acceptable when GitHub itself refused the request. The badge must
+      // show the placeholder rather than a wrong number.
+      const rateLimited = await fetch('https://api.github.com/rate_limit')
+        .then((response) => response.json())
+        .then((data) => data?.resources?.core?.remaining === 0)
+        .catch(() => false)
+      assert(rateLimited, 'star badge failed but the GitHub API was not rate limited')
+      assert(live.value === '—', `expected a placeholder, got ${live.value}`)
+      console.log('    (GitHub API rate limited; the badge degraded to a placeholder)')
+      return
+    }
+
+    assert(/^\d[\d,.]*$/.test(live.value), `unexpected star count ${live.value}`)
     assert(Number(live.value.replace(/,/g, '')) >= 0, `unexpected star count ${live.value}`)
   })
 
@@ -386,10 +423,7 @@ async function browserChecks(baseUrl) {
   })
   const mobilePage = await mobile.newPage()
   const mobileErrors = []
-  mobilePage.on('console', (message) => {
-    if (message.type() === 'error') mobileErrors.push(excerpt(message.text(), 300))
-  })
-  mobilePage.on('pageerror', (error) => mobileErrors.push(`pageerror: ${error.message}`))
+  collectConsoleErrors(mobilePage, mobileErrors)
 
   for (const route of ROUTES) {
     await check(`${route} mobile overflow`, async () => {

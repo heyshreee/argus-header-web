@@ -1,0 +1,37 @@
+{
+  "name": "argus-header-web",
+  "private": true,
+  "version": "0.8.0",
+  "description": "Website for Argus Header — the open-source HTTP security header analyzer.",
+  "license": "MIT",
+  "type": "module",
+  "homepage": "https://argus-header.vercel.app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/heyshreee/argus-header-web.git"
+  },
+  "bugs": {
+    "url": "https://github.com/heyshreee/argus-header-web/issues"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node scripts/prerender.mjs",
+    "preview": "vite preview",
+    "preview:prod": "node scripts/serve-dist.mjs",
+    "qa": "node scripts/qa.mjs"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.18.4"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "playwright": "^1.64.1",
+    "vite": "^8.3.4"
+  }
+}

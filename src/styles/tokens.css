@@ -1,0 +1,117 @@
+/* Argus Header — terminal design tokens
+   Reference direction: black ground, monochrome type, green machine status. */
+
+:root {
+  color-scheme: dark;
+
+  /* ---- grounds & surfaces ---------------------------------------- */
+  --bg: #000000;
+  --bg-2: #030712;
+  --surface: #030712;
+  --surface-2: #000000;
+  --surface-3: #111827;
+  --surface-raised: #0a0a0a;
+
+  /* ---- lines ------------------------------------------------------ */
+  --line: #1f2937;
+  --line-bright: #374151;
+  --line-accent: rgba(255, 255, 255, 0.35);
+
+  /* ---- text ------------------------------------------------------- */
+  --fg: #ffffff;
+  --fg-muted: #9ca3af;
+  --fg-faint: #8090a3;
+  --fg-inverse: #000000;
+
+  /* ---- signal colours --------------------------------------------- */
+  --accent: #ffffff;
+  --accent-bright: #ffffff;
+  --accent-dark: #000000;
+  --green: #22c55e;
+  --green-bright: #4ade80;
+  --blue: #9ca3af;
+  --warning: #eab308;
+  --danger: #ef4444;
+  --critical: #ef4444;
+  --high: #ef4444;
+  --medium: #eab308;
+  --low: #9ca3af;
+
+  /* ---- derived alpha surfaces ------------------------------------- */
+  --accent-a04: rgba(255, 255, 255, 0.04);
+  --accent-a08: rgba(255, 255, 255, 0.08);
+  --accent-a12: rgba(255, 255, 255, 0.12);
+  --accent-a20: rgba(255, 255, 255, 0.2);
+  --blue-a08: rgba(156, 163, 175, 0.08);
+  --blue-a18: rgba(156, 163, 175, 0.18);
+  --warning-a08: rgba(234, 179, 8, 0.08);
+  --warning-a20: rgba(234, 179, 8, 0.2);
+  --danger-a08: rgba(239, 68, 68, 0.08);
+  --danger-a20: rgba(239, 68, 68, 0.2);
+  --veil: rgba(0, 0, 0, 0.86);
+
+  /* ---- typography -------------------------------------------------- */
+  --font-sans: 'Geist', system-ui, -apple-system, 'Segoe UI', Helvetica, Arial,
+    sans-serif;
+  --font-mono: 'Geist Mono', 'JetBrains Mono', ui-monospace, SFMono-Regular,
+    'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+
+  --fs-display: clamp(2rem, 1.1rem + 3.4vw, 3.8rem);
+  --fs-h2: clamp(1.75rem, 1.25rem + 2.2vw, 3rem);
+  --fs-h3: clamp(1.05rem, 1rem + 0.3vw, 1.25rem);
+  --fs-lead: clamp(1rem, 0.95rem + 0.25vw, 1.15rem);
+  --fs-body: 1rem;
+  --fs-body-sm: 0.9rem;
+  --fs-mono: 0.8125rem;
+  --fs-mono-sm: 0.75rem;
+  --fs-mono-xs: 0.6875rem;
+  --fs-label: 0.6875rem;
+
+  --lh-display: 1.08;
+  --lh-snug: 1.25;
+  --lh-body: 1.7;
+  --tr-display: -0.035em;
+  --tr-heading: -0.025em;
+  --tr-label: 0.16em;
+  --tr-mono: 0;
+
+  /* ---- spacing (4 / 8 rhythm) -------------------------------------- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 40px;
+  --s-8: 48px;
+  --s-9: 64px;
+  --s-10: 80px;
+  --s-11: 96px;
+  --s-12: 120px;
+  --section-y: clamp(64px, 7vw, 100px);
+
+  /* ---- geometry ------------------------------------------------------ */
+  --radius-sm: 0;
+  --radius: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+  --container: 1280px;
+  --gutter: clamp(20px, 4vw, 48px);
+  --nav-height: 71px;
+  --grid-size: 72px;
+
+  /* ---- motion --------------------------------------------------------- */
+  --t-fast: 150ms;
+  --t-mid: 230ms;
+  --t-slow: 380ms;
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-in: cubic-bezier(0.55, 0.06, 0.68, 0.19);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-fast: 0.01ms;
+    --t-mid: 0.01ms;
+    --t-slow: 0.01ms;
+  }
+}
